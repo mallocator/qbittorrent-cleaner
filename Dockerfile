@@ -1,19 +1,40 @@
-FROM node:18-alpine
+# Build stage
+FROM golang:1.20-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json index.js ./
+# Install UPX for binary compression
+RUN apk add --no-cache upx
 
-RUN npm install
+# Copy Go module files and source code
+COPY go.mod .
+COPY main.go .
+COPY qbittorrent/ ./qbittorrent/
 
-#Specify one ore more directories to watch for changes
+# Build the Go application with optimizations for size
+# -s -w: strip debugging information
+# -trimpath: removes file system paths from the resulting binary
+# -ldflags="-s -w": removes symbol table and DWARF debugging information
+# Additional flags for maximum size reduction
+RUN go mod tidy && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -extldflags '-static'" -trimpath -o qbt-clean . && \
+    # Compress the binary with UPX using best compression (--best) and LZMA algorithm (--lzma)
+    upx --best --lzma qbt-clean
+
+# Final stage - using scratch (the smallest possible base image)
+FROM scratch
+
+# Copy CA certificates for HTTPS requests
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Copy the binary from the builder stage
+COPY --from=builder /app/qbt-clean /qbt-clean
+
+# Set environment variables with defaults
 ENV DOWNLOAD_DIRS=/downloads
-# The URL of your qbittorent server running the WebUI
 ENV SERVER_URL=https://10.0.0.1:8080
-# The username configured in the WebUI for qbittorent
 ENV SERVER_USER=admin
-# The password configured in the WebUI for qbittorent
 ENV SERVER_PASS=adminadmin
 
-# The image will terminate at the end. This image is expected to be run mutiple times.
-CMD ["node", "index.js"]
+# Run the application
+ENTRYPOINT ["/qbt-clean"]

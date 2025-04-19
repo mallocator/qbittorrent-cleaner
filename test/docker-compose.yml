@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbt-test-instance
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - WEBUI_PORT=8080
+      - WEBUI_USERNAME=admin
+      - WEBUI_PASSWORD=adminadmin
+      - QBT_WEBUI_USERNAME=admin
+      - QBT_WEBUI_PASSWORD=adminadmin
+    volumes:
+      - ./test-data/config:/config
+      - ./test-data/downloads:/downloads
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - qbt-test-network
+
+  qbt-clean:
+    build:
+      context: ..
+    container_name: qbt-clean-test
+    environment:
+      - DOWNLOAD_DIRS=/downloads
+      - SERVER_URL=http://qbittorrent:8080
+      - SERVER_USER=admin
+      - SERVER_PASS=adminadmin
+    volumes:
+      - ./test-data/downloads:/downloads
+    depends_on:
+      - qbittorrent
+    networks:
+      - qbt-test-network
+
+networks:
+  qbt-test-network:
+    driver: bridge
