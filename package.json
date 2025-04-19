@@ -16,6 +16,6 @@
   "author": "Ravi Gairola <mallox@pyxzl.net>",
   "license": "ISC",
   "dependencies": {
-    "@ctrl/qbittorrent": "^5.0.0"
+    "@ctrl/qbittorrent": "^8.3.0"
   }
 }

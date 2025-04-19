@@ -20,11 +20,10 @@ if (!torrents?.length) {
 }
 
 for (const torrent of torrents) {
-  if (!torrent.completed) {
+  if (torrent.amount_left && !(torrent.state in ['moving', 'error'])) {
     console.log(`Skipping because it's not complete: ${torrent.name} `)
     continue;
   }
-  console.log(`Verifying if all are files present: ${torrent.name}`)
   const files = await client.torrentFiles(torrent.hash)
   let missing = false;
   for (const file of files) {
@@ -38,7 +37,7 @@ for (const torrent of torrents) {
         found = found || fs.existsSync(path.join(dir, file.name))
       }
       if (!found) {
-        console.log(`File ${file.name} is missing for ${torrent.name}, removing the torrent from qBT`)
+        console.log(`File ${file.name} is missing for ${torrent.name} -> REMOVING`)
         missing = true;
         await client.removeTorrent(torrent.hash, true)
       }

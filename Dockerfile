@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json index.js ./
 
-RUN npm install --omit=dev
+RUN npm install
 
 #Specify one ore more directories to watch for changes
 ENV DOWNLOAD_DIRS=/downloads
@@ -16,4 +16,4 @@ ENV SERVER_USER=admin
 ENV SERVER_PASS=adminadmin
 
 # The image will terminate at the end. This image is expected to be run mutiple times.
-CMD ["npm", "start"]
+CMD ["node", "index.js"]
