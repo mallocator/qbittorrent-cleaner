@@ -1,20 +1,18 @@
 package test
 
 import (
-	"byte
+	"bytes"
 	"fmt"
-"
 	"io"
 	"mime/multipart"
-	"net/h
+	"net/http"
 	"os"
-os"
-	"path/filep
 	"path/filepath"
-	"io"
 	"strings"
+	"testing"
+	"time"
 
-	"github.com/mallox/qbt-clean/qbittorrent"
+	"github.com/mallox/qbittorrent-cleaner/qbittorrent"
 )
 
 // uploadTorrent uploads a torrent file to qBittorrent

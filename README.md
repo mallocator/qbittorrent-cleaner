@@ -20,12 +20,12 @@ This application connects to a qBittorrent WebUI, checks all completed torrents,
 The Docker image has been optimized to reduce its footprint while maintaining full functionality. The following optimizations were made:
 
 ### Original Dockerfile
-- Used golang:1.20-alpine as the builder image
+- Used golang:1.24-alpine as the builder image
 - Used alpine:3.18 as the final image
 - Total image size: 14.4MB
 
 ### Optimized Dockerfile
-- Used golang:1.20-alpine as the builder image
+- Used golang:1.24-alpine as the builder image
 - Used scratch as the final image (the smallest possible base image)
 - Added build flags for size optimization:
   - `-ldflags="-s -w"` to strip debug information
@@ -125,4 +125,4 @@ The test environment is automatically set up and torn down by the test script.
 
 ## License
 
-ISC
+MIT
